@@ -33,6 +33,104 @@ function mific_modern_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'mific_modern_assets' );
 
+function mific_modern_sections() {
+	return array(
+		'institucion' => array(
+			'title'       => 'Institución',
+			'eyebrow'     => 'Conoce MIFIC',
+			'description' => 'Somos la institución encargada de promover el desarrollo económico, industrial y comercial de Nicaragua.',
+			'items'       => array(
+				array( 'icon' => 'briefcase', 'title' => 'Misión', 'text' => 'Impulsar políticas, programas y servicios que fortalezcan la producción, el comercio y la inversión.' ),
+				array( 'icon' => 'chart', 'title' => 'Visión', 'text' => 'Ser una institución moderna, cercana y eficiente para empresas, consumidores e inversionistas.' ),
+				array( 'icon' => 'shield', 'title' => 'Valores', 'text' => 'Transparencia, calidad de servicio, innovación, responsabilidad y compromiso con la ciudadanía.' ),
+			),
+		),
+		'servicios' => array(
+			'title'       => 'Servicios',
+			'eyebrow'     => 'Atención institucional',
+			'description' => 'Accede a servicios orientados a industria, comercio, inversión, exportaciones y protección al consumidor.',
+			'items'       => array(
+				array( 'icon' => 'factory', 'title' => 'Industria', 'text' => 'Acompañamiento para el desarrollo industrial y manufacturero.' ),
+				array( 'icon' => 'store', 'title' => 'Comercio', 'text' => 'Servicios para empresas, comercios y actividades económicas.' ),
+				array( 'icon' => 'globe', 'title' => 'Exportaciones', 'text' => 'Apoyo para comercio exterior, oportunidades y mercados internacionales.' ),
+				array( 'icon' => 'shield', 'title' => 'Protección al Consumidor', 'text' => 'Orientación y defensa de derechos de las personas consumidoras.' ),
+			),
+		),
+		'tramites' => array(
+			'title'       => 'Trámites',
+			'eyebrow'     => 'Gestiones en línea',
+			'description' => 'Consulta y realiza los trámites más solicitados de forma clara, rápida y segura.',
+			'items'       => array(
+				array( 'icon' => 'file', 'title' => 'Registro Empresarial', 'text' => 'Inscribe tu empresa y formaliza tus operaciones comerciales.' ),
+				array( 'icon' => 'store', 'title' => 'Licencias Comerciales', 'text' => 'Gestiona permisos necesarios para operar tu negocio.' ),
+				array( 'icon' => 'award', 'title' => 'Certificaciones', 'text' => 'Solicita certificaciones oficiales y documentos institucionales.' ),
+				array( 'icon' => 'globe', 'title' => 'Comercio Exterior', 'text' => 'Accede a servicios relacionados con exportación e importación.' ),
+			),
+		),
+		'noticias' => array(
+			'title'       => 'Noticias',
+			'eyebrow'     => 'Actualidad',
+			'description' => 'Mantente informado sobre comunicados, eventos, programas y actividades institucionales.',
+			'items'       => array(
+				array( 'icon' => 'globe', 'title' => 'Comercio exterior', 'text' => 'Nuevas oportunidades comerciales y acuerdos de cooperación.' ),
+				array( 'icon' => 'factory', 'title' => 'Industria nacional', 'text' => 'Programas de apoyo para fortalecer la producción nacional.' ),
+				array( 'icon' => 'briefcase', 'title' => 'Eventos empresariales', 'text' => 'Ferias, encuentros y ruedas de negocio para emprendedores.' ),
+			),
+		),
+		'transparencia' => array(
+			'title'       => 'Transparencia',
+			'eyebrow'     => 'Información pública',
+			'description' => 'Consulta documentos, normativas, informes y recursos institucionales de acceso público.',
+			'items'       => array(
+				array( 'icon' => 'file', 'title' => 'Normativas', 'text' => 'Leyes, reglamentos, acuerdos y disposiciones relacionadas con el MIFIC.' ),
+				array( 'icon' => 'chart', 'title' => 'Informes', 'text' => 'Datos institucionales, reportes de gestión y resultados de programas.' ),
+				array( 'icon' => 'award', 'title' => 'Publicaciones', 'text' => 'Recursos, guías y documentos oficiales para consulta ciudadana.' ),
+			),
+		),
+		'contacto' => array(
+			'title'       => 'Contacto',
+			'eyebrow'     => 'Estamos para ayudarte',
+			'description' => 'Comunícate con nuestro equipo para recibir asistencia sobre servicios, trámites y consultas institucionales.',
+			'items'       => array(
+				array( 'icon' => 'store', 'title' => 'Dirección', 'text' => 'Km. 6 Carretera a Masaya, Managua, Nicaragua.' ),
+				array( 'icon' => 'file', 'title' => 'Teléfono', 'text' => '+505 2248-9300' ),
+				array( 'icon' => 'briefcase', 'title' => 'Correo', 'text' => 'info@mific.gob.ni' ),
+			),
+		),
+	);
+}
+
+function mific_modern_current_section_slug() {
+	$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
+	$slug = trim( (string) $path, '/' );
+
+	if ( false !== strpos( $slug, '/' ) ) {
+		$parts = explode( '/', $slug );
+		$slug  = end( $parts );
+	}
+
+	return sanitize_key( $slug );
+}
+
+function mific_modern_section_template( $template ) {
+	$sections = mific_modern_sections();
+	$slug     = mific_modern_current_section_slug();
+
+	if ( isset( $sections[ $slug ] ) ) {
+		global $wp_query;
+
+		if ( $wp_query ) {
+			$wp_query->is_404 = false;
+		}
+
+		status_header( 200 );
+		return get_template_directory() . '/section-page.php';
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'mific_modern_section_template', 20 );
+
 function mific_modern_default_menu() {
 	$items = array(
 		'Inicio'        => home_url( '/' ),
@@ -46,7 +144,9 @@ function mific_modern_default_menu() {
 
 	echo '<ul class="menu">';
 	foreach ( $items as $label => $url ) {
-		$class = 'Inicio' === $label ? ' class="is-active"' : '';
+		$slug         = sanitize_key( remove_accents( $label ) );
+		$current_slug = mific_modern_current_section_slug();
+		$class        = ( ( '' === $current_slug && 'Inicio' === $label ) || $current_slug === $slug ) ? ' class="is-active"' : '';
 		printf(
 			'<li><a%s href="%s">%s</a></li>',
 			$class,
